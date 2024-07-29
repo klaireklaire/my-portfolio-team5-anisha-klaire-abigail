@@ -22,13 +22,15 @@ for ticker in ticker_symbols:
         'Change in Price': price_change_stock,
         'Change in Price %': price_change_percentage_stock,
         '52-Week Low': fifty_two_week_low,
-        '52-Week High': fifty_two_week_high
+        '52-Week High': fifty_two_week_high,
+        'Date added': None,
+        'Number of Shares': None,
+        'Total Value':None,
     }    
     )
 
-print(stock_data)
 
-columns = ['Stock Ticker', 'Company Name', 'Current Price', 'Change in Price', 'Change in Price %', '52-Week Low', '52-Week High']
+columns = ['Stock Ticker', 'Company Name', 'Current Price', 'Change in Price', 'Change in Price %', '52-Week Low', '52-Week High', 'Date Added', 'Number of Shares', 'Total Value']
 
 portfolio_df = pd.DataFrame(stock_data, columns=columns)
 print(portfolio_df)
