@@ -14,3 +14,10 @@ df = pd.read_csv(f"https://query1.finance.yahoo.com/v7/finance/download/{stock}?
     parse_dates = ['Date'], index_col='Date')
 
 print(df)
+
+import yfinance as yf
+
+msft = yf.Ticker("MSFT")
+
+# get all stock info
+print(msft.info)
