@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import matplotlib
 matplotlib.use('Agg')  # Use the Agg backend for Matplotlib
@@ -20,30 +20,25 @@ def home():
 
 @app.route('/plot')
 def plot():
-     # Get the stock ticker from the request
+    # Get the stock ticker and time range from the request
     ticker = request.args.get('ticker')
     range_option = request.args.get('range', '1y')
     
     if not ticker:
-        return "No ticker provided", 400
+        return jsonify({'error': 'No ticker provided'}), 400
 
     # Define the date range based on the selected option
     end_date = datetime.now()
     if range_option == '1y':
         start_date = end_date - timedelta(days=365)
-        title_range = "1 Year"
     elif range_option == '6m':
         start_date = end_date - timedelta(days=182)
-        title_range = "6 Months"
     elif range_option == '3m':
         start_date = end_date - timedelta(days=91)
-        title_range = "3 Months"
     elif range_option == '1m':
         start_date = end_date - timedelta(days=30)
-        title_range = "1 Month"
     else:
-        start_date = end_date - timedelta(days=365)
-        title_range = "1 Year"  # Default to 1 year
+        start_date = end_date - timedelta(days=365)  # Default to 1 year
 
     start_date = int(start_date.timestamp())
     end_date = int(end_date.timestamp())
@@ -55,21 +50,13 @@ def plot():
         index_col='Date'
     )
 
-    # Generate the plot
-    plt.figure(figsize=(10, 5))
-    plt.plot(df.index, df['Adj Close'], label='Adj Close Price')
-    plt.title(f'{ticker} Stock Price Over the Last {title_range}')
-    plt.xlabel('Date')
-    plt.ylabel('Adjusted Close Price')
-    plt.legend()
+    # Prepare data for Chart.js
+    data = {
+        'labels': df.index.strftime('%Y-%m-%d').tolist(),
+        'prices': df['Adj Close'].tolist()
+    }
 
-    # Save the plot to a BytesIO object
-    img = io.BytesIO()
-    plt.savefig(img, format='png')
-    img.seek(0)
-    plt.close()
-
-    return send_file(img, mimetype='image/png')
+    return jsonify(data)
 
 if __name__ == '__main__':
     app.run(debug=True)

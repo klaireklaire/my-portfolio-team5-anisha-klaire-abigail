@@ -7,6 +7,7 @@
     <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
     <title>Stock Portfolio</title>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 </head>
 <body>
@@ -53,12 +54,14 @@
             <button type="submit" class="btn btn-success mb-2 ml-2">View Chart</button>
         </form>
         <div class="mt-5" id="chart-container">
-            <img id="stock-chart" src="" alt="Stock Chart" style="display:none;">
+            <canvas id="stock-chart" style="display:none;"></canvas>
         </div>
     </div>
 
     <script>
         $(document).ready(function() {
+            var chart;
+
             $('.time-range').click(function() {
                 $('.time-range').removeClass('active');
                 $(this).addClass('active');
@@ -74,7 +77,46 @@
                     return;
                 }
                 var chartUrl = `/plot?ticker=${ticker}&range=${range}`;
-                $('#stock-chart').attr('src', chartUrl).show();
+                
+                $.getJSON(chartUrl, function(data) {
+                    $('#stock-chart').show();
+                    var ctx = document.getElementById('stock-chart').getContext('2d');
+                    if (chart) {
+                        chart.destroy();
+                    }
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Adj Close Price',
+                                data: data.prices,
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                borderWidth: 1,
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                x: {
+                                    display: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Date'
+                                    }
+                                },
+                                y: {
+                                    display: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Price'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                });
             });
         });
     </script>
