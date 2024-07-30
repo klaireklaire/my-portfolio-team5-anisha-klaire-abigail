@@ -22,3 +22,13 @@
     max-width: 100%;
     height: auto;
 }
+#additional-info {
+    margin-top: 20px;
+}
+#additional-info .col {
+    text-align: center;
+    margin-bottom: 10px;
+}
+#additional-info span.title {
+    font-weight: bold;
+}

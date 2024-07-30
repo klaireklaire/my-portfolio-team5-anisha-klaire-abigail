@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 </head>
+
 <body>
     <div class="container">
         <h1 class="mt-5">User's Stock Portfolio</h1>
@@ -56,6 +58,44 @@
         <div class="mt-5" id="chart-container">
             <canvas id="stock-chart" style="display:none;"></canvas>
         </div>
+        <div id="additional-info" class="row" style="display:none;">
+            <div class="col-sm-6 col-md-4 col-lg-2">
+                <span class="title">Open:</span> <span id="info-open"></span>
+            </div>
+            <div class="col-sm-6 col-md-4 col-lg-2">
+                <span class="title">High:</span> <span id="info-high"></span>
+            </div>
+            <div class="col-sm-6 col-md-4 col-lg-2">
+                <span class="title">Low:</span> <span id="info-low"></span>
+            </div>
+            <div class="col-sm-6 col-md-4 col-lg-2">
+                <span class="title">Vol:</span> <span id="info-volume"></span>
+            </div>
+            <div class="col-sm-6 col-md-4 col-lg-2">
+                <span class="title">Market Cap:</span> <span id="info-marketCap"></span>
+            </div>
+            <div class="col-sm-6 col-md-4 col-lg-2">
+                <span class="title">P/E Ratio:</span> <span id="info-peRatio"></span>
+            </div>
+            <div class="col-sm-6 col-md-4 col-lg-2">
+                <span class="title">52W High:</span> <span id="info-52WeekHigh"></span>
+            </div>
+            <div class="col-sm-6 col-md-4 col-lg-2">
+                <span class="title">52W Low:</span> <span id="info-52WeekLow"></span>
+            </div>
+            <div class="col-sm-6 col-md-4 col-lg-2">
+                <span class="title">Avg Vol:</span> <span id="info-avgVolume"></span>
+            </div>
+            <div class="col-sm-6 col-md-4 col-lg-2">
+                <span class="title">Yield:</span> <span id="info-yield"></span>
+            </div>
+            <div class="col-sm-6 col-md-4 col-lg-2">
+                <span class="title">Beta:</span> <span id="info-beta"></span>
+            </div>
+            <div class="col-sm-6 col-md-4 col-lg-2">
+                <span class="title">EPS:</span> <span id="info-eps"></span>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -76,10 +116,13 @@
                     alert("Please select a time range.");
                     return;
                 }
-                var chartUrl = `/plot?ticker=${ticker}&range=${range}`;
+                var chartUrl = `/chart_data?ticker=${ticker}&range=${range}`;
+                var infoUrl = `/additional_info?ticker=${ticker}`;
                 
                 $.getJSON(chartUrl, function(data) {
                     $('#stock-chart').show();
+
+                    // Update chart
                     var ctx = document.getElementById('stock-chart').getContext('2d');
                     if (chart) {
                         chart.destroy();
@@ -87,10 +130,10 @@
                     chart = new Chart(ctx, {
                         type: 'line',
                         data: {
-                            labels: data.labels,
+                            labels: data.chart_data.labels,
                             datasets: [{
                                 label: 'Adj Close Price',
-                                data: data.prices,
+                                data: data.chart_data.prices,
                                 borderColor: 'rgba(75, 192, 192, 1)',
                                 borderWidth: 1,
                                 fill: false
@@ -117,8 +160,27 @@
                         }
                     });
                 });
+
+                $.getJSON(infoUrl, function(data) {
+                    $('#additional-info').show();
+
+                    // Update additional information
+                    $('#info-open').text(data.additional_info.open);
+                    $('#info-high').text(data.additional_info.high);
+                    $('#info-low').text(data.additional_info.low);
+                    $('#info-volume').text(data.additional_info.volume);
+                    $('#info-marketCap').text(data.additional_info.marketCap);
+                    $('#info-peRatio').text(data.additional_info.peRatio);
+                    $('#info-52WeekHigh').text(data.additional_info['52WeekHigh']);
+                    $('#info-52WeekLow').text(data.additional_info['52WeekLow']);
+                    $('#info-avgVolume').text(data.additional_info.avgVolume);
+                    $('#info-yield').text(data.additional_info.yield);
+                    $('#info-beta').text(data.additional_info.beta);
+                    $('#info-eps').text(data.additional_info.eps);
+                });
             });
         });
     </script>
 </body>
+
 </html>

@@ -1,9 +1,6 @@
 from flask import Flask, render_template, request, jsonify
+import yfinance as yf
 import pandas as pd
-import matplotlib
-matplotlib.use('Agg')  # Use the Agg backend for Matplotlib
-import matplotlib.pyplot as plt
-import io
 from datetime import datetime, timedelta
 
 app = Flask(__name__)
@@ -18,16 +15,14 @@ def home():
     ]
     return render_template('index.html', portfolio=portfolio)
 
-@app.route('/plot')
-def plot():
-    # Get the stock ticker and time range from the request
+@app.route('/chart_data')
+def chart_data():
     ticker = request.args.get('ticker')
     range_option = request.args.get('range', '1y')
     
     if not ticker:
         return jsonify({'error': 'No ticker provided'}), 400
 
-    # Define the date range based on the selected option
     end_date = datetime.now()
     if range_option == '1y':
         start_date = end_date - timedelta(days=365)
@@ -44,19 +39,42 @@ def plot():
     end_date = int(end_date.timestamp())
 
     # Fetch the stock data
-    df = pd.read_csv(
-        f"https://query1.finance.yahoo.com/v7/finance/download/{ticker}?period1={start_date}&period2={end_date}&interval=1d&events=history&includeAdjustedClose=true",
-        parse_dates=['Date'],
-        index_col='Date'
-    )
+    stock = yf.Ticker(ticker)
+    df = stock.history(start=datetime.fromtimestamp(start_date), end=datetime.fromtimestamp(end_date))
 
     # Prepare data for Chart.js
-    data = {
+    chart_data = {
         'labels': df.index.strftime('%Y-%m-%d').tolist(),
-        'prices': df['Adj Close'].tolist()
+        'prices': df['Close'].tolist()
     }
 
-    return jsonify(data)
+    return jsonify(chart_data=chart_data)
+
+@app.route('/additional_info')
+def additional_info():
+    ticker = request.args.get('ticker')
+    
+    if not ticker:
+        return jsonify({'error': 'No ticker provided'}), 400
+
+    stock = yf.Ticker(ticker)
+    info = stock.info
+    additional_info = {
+        'open': info.get('open', 'N/A'),
+        'high': info.get('dayHigh', 'N/A'),
+        'low': info.get('dayLow', 'N/A'),
+        'volume': info.get('volume', 'N/A'),
+        'marketCap': info.get('marketCap', 'N/A'),
+        'peRatio': info.get('trailingPE', 'N/A'),
+        '52WeekHigh': info.get('fiftyTwoWeekHigh', 'N/A'),
+        '52WeekLow': info.get('fiftyTwoWeekLow', 'N/A'),
+        'avgVolume': info.get('averageVolume', 'N/A'),
+        'yield': info.get('dividendYield', 'N/A'),
+        'beta': info.get('beta', 'N/A'),
+        'eps': info.get('trailingEps', 'N/A')
+    }
+
+    return jsonify(additional_info=additional_info)
 
 if __name__ == '__main__':
     app.run(debug=True)
