@@ -33,4 +33,3 @@ for ticker in ticker_symbols:
 columns = ['Stock Ticker', 'Company Name', 'Current Price', 'Change in Price', 'Change in Price %', '52-Week Low', '52-Week High', 'Date Added', 'Number of Shares', 'Total Value']
 
 portfolio_df = pd.DataFrame(stock_data, columns=columns)
-print(portfolio_df)

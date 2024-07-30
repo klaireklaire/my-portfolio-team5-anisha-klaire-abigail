@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, jsonify
 from getData import portfolio_df
-from flask import Flask, render_template, request, jsonify
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
