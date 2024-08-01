@@ -1,4 +1,6 @@
+
 from flask import Flask, render_template, request, jsonify
+
 from getData import portfolio_df
 import yfinance as yf
 import pandas as pd
@@ -76,6 +78,13 @@ def additional_info():
     }
 
     return jsonify(additional_info=additional_info)
+@app.route('/portfolio', methods=['GET'])
+def get_portfolio():
+    #portfolio_subset = portfolio_df['Stock Ticker', 'Company Name', 'Current Price', 'Change in Price %', 'Number of Shares', 'Total Value']
+    table_html = portfolio_df.to_html(classes='table table-striped', index=False)
+    return render_template('index1.html', table_html=table_html)
+    
+
 
 if __name__ == '__main__':
     app.run(debug=True)
