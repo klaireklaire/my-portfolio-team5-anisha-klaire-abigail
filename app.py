@@ -90,16 +90,8 @@ def additional_info():
     }
 
     return jsonify(additional_info=additional_info)
-
-@app.route('/portfolio', methods=['GET'])
-def get_portfolio():
-    #portfolio_subset = portfolio_df['Stock Ticker', 'Company Name', 'Current Price', 'Change in Price %', 'Number of Shares', 'Total Value']
-    table_html = getData.portfolio_df.to_html(classes='table table-striped', index=False)
-    return render_template('index1.html', table_html=table_html)
     
-@app.route('/display', methods=['GET'])
-def display():
-    return jsonify(portfolio_df.to_json())
+
 @app.route('/transactions', methods=['GET'])
 def get_transactions():
     db = create_db_connection()
@@ -138,6 +130,41 @@ def get_transaction(transaction_id):
         return jsonify(transaction)
     else:
         return jsonify({'error': 'Transaction not found'}), 404
+
+def calculate_position():
+    connection = create_db_connection()
+    cursor = connection.cursor(dictionary=True)
+    query = "SELECT ticker, position, side FROM transactions"
+    cursor.execute(query)
+    transactions = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    
+    portfolio={}
+    for t in transactions:
+        ticker = t['ticker']
+        quantity = t['position']
+        side = t['side']
+        
+        if ticker not in portfolio:
+            portfolio[ticker] = 0
+        
+        if side =='buy':
+            portfolio[ticker] += quantity
+        elif side =='sell':
+            portfolio[ticker] -= quantity
+        
+    return portfolio
+
+@app.route('/portfolio', methods=['GET'])
+def get_portfolio():
+    
+    portfolio = calculate_position()
+    return jsonify(portfolio)
+
+
+    
+    
 
 if __name__ == '__main__':
     db_service.initialize_database()  # Initialize the database tables

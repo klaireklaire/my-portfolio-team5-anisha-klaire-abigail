@@ -27,4 +27,5 @@ Make sure the `yfinance` package is installed. You can install it using `pip`:
 
 ```sh
 pip install yfinance
+pip install -U flask-cors
 
