@@ -1,62 +1,56 @@
-# Flask Stock Portfolio
+Sure, here is a detailed README for setting up environment variables using a `.env` file. You can place this README file in the `data_service` directory to guide your teammates on how to set up the necessary environment variables.
 
-A simple web application to display a user's stock portfolio using Flask as the backend and Bootstrap for the frontend.
+### `data_service/README.md`
 
-## Project Structure
+```markdown
+# Data Service Setup
 
-```
-flask_portfolio/
-├── app.py
-├── templates/
-│   └── index.html
-├── static/
-│   └── style.css
-└── venv/
-```
+This document provides instructions on how to set up environment variables for the Data Service using a `.env` file.
 
-## Requirements
+## Prerequisites
 
 - Python 3.x
-- Flask
+- `pip` package manager
+- MySQL Server activated and connected
+- `python-dotenv` package
 
-## Installation
+## Setting Up Environment Variables
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/yourusername/flask_portfolio.git
-   cd flask_portfolio
-   ```
+To keep sensitive information such as database credentials secure and configurable, we use environment variables stored in a `.env` file. Follow the steps below to set this up:
 
-2. **Create a virtual environment**:
-   ```bash
-   python -m venv venv
-   ```
+### 1. Install `python-dotenv`
 
-3. **Activate the virtual environment**:
-   - On Windows:
-     ```bash
-     venv\Scripts\activate
-     ```
-   - On macOS/Linux:
-     ```bash
-     source venv/bin/activate
-     ```
+Make sure the `python-dotenv` package is installed. You can install it using `pip`:
 
-4. **Install Flask**:
-   ```bash
-   pip install Flask
-   ```
+```sh
+pip install python-dotenv
+```
 
-## Running the Application
+### 2. Create a `.env` File
 
-1. **Run the Flask app**:
-   ```bash
-   python app.py
-   ```
+Create a file named `.env` in the root directory of your project. This file will store your environment variables.
 
-2. **Access the application**:
-   Open a web browser and go to `http://127.0.0.1:5000/`.
+### 3. Add Environment Variables
 
-## Application Details
+Add the following environment variables to the `.env` file:
 
-The application displays a user's stock portfolio with hardcoded data for simplicity. You can extend this by fetching data from a database or an external API.
+```
+FLASK_DB_HOST=localhost
+FLASK_DB_USER=root
+FLASK_DB_PASSWORD=your_password_here
+FLASK_DB_NAME=stock_portfolio
+```
+
+Replace `your_password_here` with your actual MySQL root password.
+
+### 4. Load Environment Variables
+
+Ensure your Python scripts are set up to load these environment variables. The `initialize_db.py` and `app.py` files should include the following lines to load the environment variables from the `.env` file:
+
+```python
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+```

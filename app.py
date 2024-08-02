@@ -3,27 +3,35 @@
 """app.py: Set up app routes and API endpoints for the app."""
 
 from flask import Flask, render_template, request, jsonify
-import sys
-import data_service
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
+import data_service.initialize_db as db_service
+from data_service.getData import portfolio_df
+from flask_cors import CORS
+import mysql.connector
+import os
+from dotenv import load_dotenv
 
-sys.path.append("data_service")
-
-import getData
+load_dotenv()
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Database connection details
+def create_db_connection(db_name=None):
+    return mysql.connector.connect(
+        host=os.getenv("FLASK_DB_HOST"),
+        user=os.getenv("FLASK_DB_USER"),
+        password=os.getenv("FLASK_DB_PASSWORD"),
+        database=db_name or os.getenv("FLASK_DB_NAME")
+    )
 
 @app.route('/')
 def home():
-    # Sample stock portfolio data
-    portfolio = [
-        {'ticker': 'AAPL', 'name': 'Apple Inc.', 'shares': 10, 'price': 150.00},
-        {'ticker': 'GOOGL', 'name': 'Alphabet Inc.', 'shares': 5, 'price': 2800.00},
-        {'ticker': 'TSLA', 'name': 'Tesla Inc.', 'shares': 8, 'price': 700.00},
-    ]
-    return render_template('index.html', portfolio=portfolio)
+    # Convert portfolio DataFrame to HTML table
+    table_html = portfolio_df.to_html(classes='table table-striped', index=False)
+    return render_template('index.html', portfolio_html=table_html)
 
 @app.route('/chart_data')
 def chart_data():
@@ -45,12 +53,9 @@ def chart_data():
     else:
         start_date = end_date - timedelta(days=365)  # Default to 1 year
 
-    start_date = int(start_date.timestamp())
-    end_date = int(end_date.timestamp())
-
     # Fetch the stock data
     stock = yf.Ticker(ticker)
-    df = stock.history(start=datetime.fromtimestamp(start_date), end=datetime.fromtimestamp(end_date))
+    df = stock.history(start=start_date, end=end_date)
 
     # Prepare data for Chart.js
     chart_data = {
@@ -95,6 +100,45 @@ def get_portfolio():
 @app.route('/display', methods=['GET'])
 def display():
     return jsonify(portfolio_df.to_json())
+@app.route('/transactions', methods=['GET'])
+def get_transactions():
+    db = create_db_connection()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM transactions")
+    transactions = cursor.fetchall()
+    cursor.close()
+    db.close()
+    return jsonify(transactions)
+
+@app.route('/transactions', methods=['POST'])
+def add_transaction():
+    db = create_db_connection()
+    cursor = db.cursor()
+    data = request.json
+    query = """
+        INSERT INTO transactions (date, ticker, side, size, price, position, pl)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+    """
+    cursor.execute(query, (data['date'], data['ticker'], data['side'], data['size'], data['price'], data['position'], data['pl']))
+    db.commit()
+    transaction_id = cursor.lastrowid
+    cursor.close()
+    db.close()
+    return jsonify({'id': transaction_id}), 201
+
+@app.route('/transactions/<int:transaction_id>', methods=['GET'])
+def get_transaction(transaction_id):
+    db = create_db_connection()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM transactions WHERE id = %s", (transaction_id,))
+    transaction = cursor.fetchone()
+    cursor.close()
+    db.close()
+    if transaction:
+        return jsonify(transaction)
+    else:
+        return jsonify({'error': 'Transaction not found'}), 404
 
 if __name__ == '__main__':
+    db_service.initialize_database()  # Initialize the database tables
     app.run(debug=True)
