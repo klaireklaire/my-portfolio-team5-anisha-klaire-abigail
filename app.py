@@ -84,6 +84,9 @@ def get_portfolio():
     table_html = portfolio_df.to_html(classes='table table-striped', index=False)
     return render_template('index1.html', table_html=table_html)
     
+@app.route('/display', methods=['GET'])
+def display():
+    return jsonify(portfolio_df.to_json())
 
 
 if __name__ == '__main__':
