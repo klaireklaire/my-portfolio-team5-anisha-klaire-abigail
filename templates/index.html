@@ -10,7 +10,6 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-</head>
 
 <body>
     <div class="container">
@@ -54,6 +53,7 @@
             </div>
             <input type="hidden" id="selected-range" name="range">
             <button type="submit" class="btn btn-success mb-2 ml-2">View Chart</button>
+            <button type="button" class="btn btn-primary mb-2 ml-2" data-toggle="modal" data-target="#transactionModal">Buy/Sell</button>
         </form>
         <div class="mt-5" id="chart-container">
             <canvas id="stock-chart" style="display:none;"></canvas>
@@ -98,89 +98,202 @@
         </div>
     </div>
 
-    <script>
-        $(document).ready(function() {
-            var chart;
+<!-- Transaction Modal -->
+<div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transactionModalLabel">Buy/Sell Stock</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="transaction-form">
+                    <div class="form-group">
+                        <label for="modal-ticker">Ticker</label>
+                        <input type="text" class="form-control" id="modal-ticker" name="ticker" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-price">Current Price</label>
+                        <input type="text" class="form-control" id="modal-price" name="price" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-side">Transaction Type</label>
+                        <select class="form-control" id="modal-side" name="side">
+                            <option value="buy">Buy</option>
+                            <option value="sell">Sell</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-size">Size</label>
+                        <input type="number" class="form-control" id="modal-size" name="size" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-total">Total Price</label>
+                        <input type="text" class="form-control" id="modal-total" name="total" readonly>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
-            $('.time-range').click(function() {
-                $('.time-range').removeClass('active');
-                $(this).addClass('active');
-                $('#selected-range').val($(this).val());
-            });
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var chart;
 
-            $('#stock-form').submit(function(event) {
-                event.preventDefault();
-                var ticker = $('#ticker').val();
-                var range = $('#selected-range').val();
-                if (!range) {
-                    alert("Please select a time range.");
-                    return;
+        $('.time-range').click(function() {
+            $('.time-range').removeClass('active');
+            $(this).addClass('active');
+            $('#selected-range').val($(this).val());
+        });
+
+        $('#stock-form').submit(function(event) {
+            event.preventDefault();
+            var ticker = $('#ticker').val();
+            var range = $('#selected-range').val();
+            if (!range) {
+                alert("Please select a time range.");
+                return;
+            }
+            var chartUrl = `/chart_data?ticker=${ticker}&range=${range}`;
+            var infoUrl = `/additional_info?ticker=${ticker}`;
+            
+            $.getJSON(chartUrl, function(data) {
+                $('#stock-chart').show();
+
+                // Update chart
+                var ctx = document.getElementById('stock-chart').getContext('2d');
+                if (chart) {
+                    chart.destroy();
                 }
-                var chartUrl = `/chart_data?ticker=${ticker}&range=${range}`;
-                var infoUrl = `/additional_info?ticker=${ticker}`;
-                
-                $.getJSON(chartUrl, function(data) {
-                    $('#stock-chart').show();
-
-                    // Update chart
-                    var ctx = document.getElementById('stock-chart').getContext('2d');
-                    if (chart) {
-                        chart.destroy();
-                    }
-                    chart = new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: data.chart_data.labels,
-                            datasets: [{
-                                label: 'Adj Close Price',
-                                data: data.chart_data.prices,
-                                borderColor: 'rgba(75, 192, 192, 1)',
-                                borderWidth: 1,
-                                fill: false
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                x: {
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: data.chart_data.labels,
+                        datasets: [{
+                            label: 'Adj Close Price',
+                            data: data.chart_data.prices,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                            fill: false
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                display: true,
+                                title: {
                                     display: true,
-                                    title: {
-                                        display: true,
-                                        text: 'Date'
-                                    }
-                                },
-                                y: {
+                                    text: 'Date'
+                                }
+                            },
+                            y: {
+                                display: true,
+                                title: {
                                     display: true,
-                                    title: {
-                                        display: true,
-                                        text: 'Price'
-                                    }
+                                    text: 'Price'
                                 }
                             }
                         }
-                    });
+                    }
                 });
+            });
 
-                $.getJSON(infoUrl, function(data) {
-                    $('#additional-info').show();
+            $.getJSON(infoUrl, function(data) {
+                $('#additional-info').show();
 
-                    // Update additional information
-                    $('#info-open').text(data.additional_info.open);
-                    $('#info-high').text(data.additional_info.high);
-                    $('#info-low').text(data.additional_info.low);
-                    $('#info-volume').text(data.additional_info.volume);
-                    $('#info-marketCap').text(data.additional_info.marketCap);
-                    $('#info-peRatio').text(data.additional_info.peRatio);
-                    $('#info-52WeekHigh').text(data.additional_info['52WeekHigh']);
-                    $('#info-52WeekLow').text(data.additional_info['52WeekLow']);
-                    $('#info-avgVolume').text(data.additional_info.avgVolume);
-                    $('#info-yield').text(data.additional_info.yield);
-                    $('#info-beta').text(data.additional_info.beta);
-                    $('#info-eps').text(data.additional_info.eps);
+                // Update additional information
+                $('#info-open').text(data.additional_info.open);
+                $('#info-high').text(data.additional_info.high);
+                $('#info-low').text(data.additional_info.low);
+                $('#info-volume').text(data.additional_info.volume);
+                $('#info-marketCap').text(data.additional_info.marketCap);
+                $('#info-peRatio').text(data.additional_info.peRatio);
+                $('#info-52WeekHigh').text(data.additional_info['52WeekHigh']);
+                $('#info-52WeekLow').text(data.additional_info['52WeekLow']);
+                $('#info-avgVolume').text(data.additional_info.avgVolume);
+                $('#info-yield').text(data.additional_info.yield);
+                $('#info-beta').text(data.additional_info.beta);
+                $('#info-eps').text(data.additional_info.eps);
+            });
+        });
+
+        $('#transactionModal').on('show.bs.modal', function (event) {
+            var ticker = $('#ticker').val();
+            if (!ticker) {
+                alert("Please enter a ticker first.");
+                return false;  // Prevent the modal from showing
+            }
+            $('#modal-ticker').val(ticker);
+
+            // Fetch current price
+            $.getJSON(`/additional_info?ticker=${ticker}`, function(data) {
+                $('#modal-price').val(data.additional_info.open); // Assuming 'open' is the current price
+
+                $('#modal-size').on('input', function() {
+                    var size = $(this).val();
+                    var price = $('#modal-price').val();
+                    $('#modal-total').val(size * price);
                 });
             });
         });
-    </script>
+
+        $('#modal-ticker').on('change', function() {
+            var ticker = $(this).val();
+
+            // Fetch and update current price
+            $.getJSON(`/additional_info?ticker=${ticker}`, function(data) {
+                $('#modal-price').val(data.additional_info.open);
+                var size = $('#modal-size').val();
+                $('#modal-total').val(size * data.additional_info.open);
+            });
+        });
+
+        $('#transaction-form').submit(function(event) {
+            event.preventDefault();
+            var ticker = $('#modal-ticker').val();
+            var side = $('#modal-side').val();
+            var size = $('#modal-size').val();
+
+            // Check if transaction is valid
+            $.getJSON('/portfolio', function(portfolio) {
+                if (side === 'sell' && (!portfolio[ticker] || portfolio[ticker][0] < size)) {
+                    alert('Not enough shares to sell');
+                    return;
+                }
+
+                var url = side === 'buy' ? '/buy' : '/sell';
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        ticker: ticker,
+                        size: size
+                    }),
+                    success: function(response) {
+                        alert('Transaction successful');
+                        $('#transactionModal').modal('hide');
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Transaction failed: ' + xhr.responseJSON.error);
+                    }
+                });
+            });
+        });
+
+        $('#transactionModal').on('hidden.bs.modal', function () {
+            // Unbind the input event handler to prevent it from binding multiple times
+            $('#modal-size').off('input');
+        });
+    });
+</script>
+
 </body>
 
 </html>

@@ -165,7 +165,10 @@ def sell_stock():
 
     portfolio = calculate_position()
     
-    if ticker not in portfolio or portfolio[ticker][0] < size:
+    print(type(portfolio[ticker][0]), portfolio[ticker][0])
+    print(type(size), size)
+    
+    if ticker not in portfolio or portfolio[ticker][0] < int(size):
         return jsonify({'error': 'Not enough shares to sell'}), 400
 
     price = current_price(ticker)
