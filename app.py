@@ -109,10 +109,10 @@ def add_transaction():
     cursor = db.cursor()
     data = request.json
     query = """
-        INSERT INTO transactions (date, ticker, side, size, price, position, pl)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO transactions (date, ticker, side, size, price)
+        VALUES (%s, %s, %s, %s, %s)
     """
-    cursor.execute(query, (data['date'], data['ticker'], data['side'], data['size'], data['price'], data['position'], data['pl']))
+    cursor.execute(query, (data['date'], data['ticker'], data['side'], data['size'], data['price']))
     db.commit()
     transaction_id = cursor.lastrowid
     cursor.close()

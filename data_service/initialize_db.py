@@ -2,8 +2,6 @@
 
 """initialize_db.py: Initialize MySQL database."""
 
-import sqlite3
-
 import mysql.connector
 from mysql.connector import Error
 from dotenv import load_dotenv
@@ -46,35 +44,20 @@ def initialize_database():
             ticker VARCHAR(10) NOT NULL,
             side ENUM('buy', 'sell') NOT NULL,
             size INT NOT NULL,
-            price DECIMAL(10, 2) NOT NULL,
-            position INT NOT NULL,
-            pl DECIMAL(10, 2) NOT NULL
+            price DECIMAL(10, 2) NOT NULL
         );
     """)
     # Insert sample data
-    """sample_data = [
-        ('2023-01-01', 'AAPL', 'buy', 10, 150.00, 10, 0.00),
-        ('2023-02-01', 'GOOG', 'buy', 5, 1000.00, 5, 0.00),
-        ('2023-03-01', 'MSFT', 'buy', 8, 180.00, 8, 0.00),
-        ('2023-03-01', 'MSFT', 'sell', 8, 200.00, -8, 400.00),
-        ('2023-04-01', 'TSLA', 'buy', 3, 600.00, 3, 0.00),
-        ('2023-04-01', 'TSLA', 'buy', 3, 650.00, 3, 0.00),
-        ('2023-04-01', 'TSLA', 'sell', 3, 600.00, 3, 0.00),
-        ('2023-05-01', 'AMZN', 'buy', 2, 3000.00, 2, 0.00),
-        ('2023-05-01', 'AMZN', 'sell', 2, 3000.00, -2, 6000.00)
-    ]"""
     sample_data = [
-        ('2023-01-01', 'AAPL', 'buy', 10, 150.00, 10, 0.00),
-        ('2023-02-01', 'AAPL', 'buy', 5, 160.00, 5, 0.00),
-        ('2023-01-01', 'AAPL', 'sell', 10, 150.00, 10, 0.00),
-        ('2023-03-01', 'MSFT', 'buy', 8, 180.00, 8, 0.00),
-        ('2023-03-01', 'MSFT', 'sell', 8, 200.00, -8, 400.00)  
-        
+        ('2023-01-01', 'AAPL', 'buy', 10, 150.00),
+        ('2023-02-01', 'GOOG', 'buy', 5, 1000.00),
+        ('2023-03-01', 'MSFT', 'sell', 8, 200.00),
+        ('2023-04-01', 'TSLA', 'buy', 3, 600.00),
+        ('2023-05-01', 'AMZN', 'sell', 2, 3000.00)
     ]
-    
     cursor.executemany("""
-        INSERT INTO transactions (date, ticker, side, size, price, position, pl)
-        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO transactions (date, ticker, side, size, price)
+        VALUES (%s, %s, %s, %s, %s)
     """, sample_data)
     db.commit()
     cursor.close()
