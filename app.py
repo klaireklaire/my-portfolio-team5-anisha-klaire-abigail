@@ -12,6 +12,7 @@ from flask_cors import CORS
 import mysql.connector
 import os
 from dotenv import load_dotenv
+from decimal import Decimal
 
 load_dotenv()
 
@@ -133,31 +134,31 @@ def get_transaction(transaction_id):
 
 def current_price(ticker):
     stock = yf.Ticker(ticker)
-    return stock.info('currentPrice')
+    return stock.info['currentPrice']
 
 def calculate_position():
     connection = create_db_connection()
     cursor = connection.cursor(dictionary=True)
-    query = "SELECT ticker, position, side, price FROM transactions"
+    query = "SELECT ticker, size, side, price FROM transactions"
     cursor.execute(query)
     transactions = cursor.fetchall()
     cursor.close()
     connection.close()
     
-    portfolio={}
+    portfolio={} #key is the ticker and value []
     for t in transactions:
         ticker = t['ticker']
-        quantity = t['position']
+        quantity = t['size']
         side = t['side']
         price = t['price']
         
         if ticker not in portfolio:
-            portfolio[ticker] = [0,price,0]
+            portfolio[ticker] = [0,price,0,0.0, 0.0] #intial average purchase price is the same as the buy price
         #if it is in portfolio and on the buy side then we need to calculate the average purchase price
         elif ticker in portfolio:
             if side == 'buy':
                 #need to calculate the average purcahse price
-                portfolio[ticker][1] = (portfolio[ticker][2]+quantity*price)/(portfolio[ticker][0]+quantity)
+                portfolio[ticker][1] = (portfolio[ticker][1]*portfolio[ticker][0]+quantity*price)/(portfolio[ticker][0]+quantity)
                 
             #when we sell the average purcahse price remains the same
         
@@ -166,8 +167,16 @@ def calculate_position():
             portfolio[ticker][2] +=price*quantity
         elif side =='sell':
             portfolio[ticker][0] -= quantity
-    #maybe I can have portfolio be the stock ticker key and value as {total shares held,average purchase price, total cost basis}
-    #need to do another chart for current price and unrealized gain/loss
+            
+        portfolio[ticker][3]=current_price(ticker)
+        portfolio[ticker][4]=Decimal(portfolio[ticker][3]*portfolio[ticker][0])
+        -portfolio[ticker][2]
+    #portfolio be the stock ticker key and value as {total shares held[0],average purchase price[1], total cost basis[2], current value of 1 shares[3], unrealized gain/loss[4]}
+    #I have the code for current price and unrealized gain/loss = current value - total cost basis
+    #current value = current price *total amount of shares
+
+    
+    
         
     return portfolio
 
