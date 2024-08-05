@@ -1,6 +1,3 @@
-### `data_service/README.md`
-
-```markdown
 # Data Service Setup
 
 This document provides instructions on how to set up environment variables for the Data Service using a `.env` file.
@@ -52,7 +49,3 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 ```
-
-pip install mysql-connector-python
-and
-pip install yfinance
