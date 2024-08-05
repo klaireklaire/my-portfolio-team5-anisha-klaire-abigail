@@ -18,21 +18,21 @@
         <table class="table table-striped mt-3">
             <thead>
                 <tr>
-                    <th scope="col">Ticker</th>
-                    <th scope="col">Name</th>
+                    <th scope="col">Ticker</th>                    
                     <th scope="col">Shares</th>
                     <th scope="col">Price per Share</th>
+                    <th scope="col">Percent Change</th>
                     <th scope="col">Total Value</th>
                 </tr>
             </thead>
             <tbody>
-                {% for stock in portfolio %}
+                {% for ticker, values in portfolio.items() %}
                 <tr>
-                    <td>{{ stock.ticker }}</td>
-                    <td>{{ stock.name }}</td>
-                    <td>{{ stock.shares }}</td>
-                    <td>${{ '%.2f' | format(stock.price) }}</td>
-                    <td>${{ '%.2f' | format(stock.shares * stock.price) }}</td>
+                    <td>{{ ticker }}</td>                   
+                    <td>{{ values[0] }}</td>
+                    <td>${{ '%.2f' | format(values[3]) }}</td>
+                    <td>{{ '%.2f' | format(values[5]) }}%</td>
+                    <td>${{ '%.2f' | format(values[0] * values[3]) }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

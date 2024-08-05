@@ -31,8 +31,9 @@ def create_db_connection(db_name=None):
 @app.route('/')
 def home():
     # Convert portfolio DataFrame to HTML table
+    portfolio = calculate_position()
     table_html = portfolio_df.to_html(classes='table table-striped', index=False)
-    return render_template('index.html', portfolio_html=table_html)
+    return render_template('index.html', portfolio=portfolio)
 
 @app.route('/chart_data')
 def chart_data():
@@ -136,6 +137,11 @@ def current_price(ticker):
     stock = yf.Ticker(ticker)
     return stock.info['currentPrice']
 
+def percent_change(ticker):
+    stock = yf.Ticker(ticker)
+    price_change_percentage_stock = stock.info['currentPrice']/stock.info['previousClose']-1
+    return price_change_percentage_stock
+
 def calculate_position():
     connection = create_db_connection()
     cursor = connection.cursor(dictionary=True)
@@ -153,7 +159,7 @@ def calculate_position():
         price = t['price']
         
         if ticker not in portfolio:
-            portfolio[ticker] = [0,price,0,0.0, 0.0] #intial average purchase price is the same as the buy price
+            portfolio[ticker] = [0,price,0,0.0, 0.0,0.0] #intial average purchase price is the same as the buy price
         #if it is in portfolio and on the buy side then we need to calculate the average purchase price
         elif ticker in portfolio:
             if side == 'buy':
@@ -170,7 +176,9 @@ def calculate_position():
             
         portfolio[ticker][3]=current_price(ticker)
         portfolio[ticker][4]=Decimal(portfolio[ticker][3]*portfolio[ticker][0])-portfolio[ticker][2]
-    #portfolio be the stock ticker key and value as {total shares held[0],average purchase price[1], total cost basis[2], current value of 1 shares[3], unrealized gain/loss[4]}
+        portfolio[ticker][5]=percent_change(ticker)
+    #portfolio be the stock ticker key and value as {total shares held[0],average purchase price[1], total cost basis[2], current value of 1 shares[3],
+    # unrealized gain/loss[4], percent change in stock value}
     #I have the code for current price and unrealized gain/loss = current value - total cost basis
     #current value = current price *total amount of shares
 
