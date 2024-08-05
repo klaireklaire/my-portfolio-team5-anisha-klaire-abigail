@@ -131,10 +131,14 @@ def get_transaction(transaction_id):
     else:
         return jsonify({'error': 'Transaction not found'}), 404
 
+def current_price(ticker):
+    stock = yf.Ticker(ticker)
+    return stock.info('currentPrice')
+
 def calculate_position():
     connection = create_db_connection()
     cursor = connection.cursor(dictionary=True)
-    query = "SELECT ticker, position, side FROM transactions"
+    query = "SELECT ticker, position, side, price FROM transactions"
     cursor.execute(query)
     transactions = cursor.fetchall()
     cursor.close()
@@ -145,16 +149,30 @@ def calculate_position():
         ticker = t['ticker']
         quantity = t['position']
         side = t['side']
+        price = t['price']
         
         if ticker not in portfolio:
-            portfolio[ticker] = 0
+            portfolio[ticker] = [0,price,0]
+        #if it is in portfolio and on the buy side then we need to calculate the average purchase price
+        elif ticker in portfolio:
+            if side == 'buy':
+                #need to calculate the average purcahse price
+                portfolio[ticker][1] = (portfolio[ticker][2]+quantity*price)/(portfolio[ticker][0]+quantity)
+                
+            #when we sell the average purcahse price remains the same
         
         if side =='buy':
-            portfolio[ticker] += quantity
+            portfolio[ticker][0] += quantity
+            portfolio[ticker][2] +=price*quantity
         elif side =='sell':
-            portfolio[ticker] -= quantity
+            portfolio[ticker][0] -= quantity
+    #maybe I can have portfolio be the stock ticker key and value as {total shares held,average purchase price, total cost basis}
+    #need to do another chart for current price and unrealized gain/loss
         
     return portfolio
+
+
+
 
 @app.route('/portfolio', methods=['GET'])
 def get_portfolio():

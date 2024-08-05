@@ -54,3 +54,7 @@ import os
 # Load environment variables from .env file
 load_dotenv()
 ```
+
+pip install mysql-connector-python
+and
+pip install yfinance
