@@ -9,6 +9,7 @@
     <title>Stock Portfolio</title>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+   
 </head>
 </head>
 
@@ -25,7 +26,7 @@
                     <th scope="col">Total Value</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="portfolio-body">
                 {% for ticker, values in portfolio.items() %}
                 <tr>
                     <td>{{ ticker }}</td>                   
