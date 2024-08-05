@@ -169,8 +169,7 @@ def calculate_position():
             portfolio[ticker][0] -= quantity
             
         portfolio[ticker][3]=current_price(ticker)
-        portfolio[ticker][4]=Decimal(portfolio[ticker][3]*portfolio[ticker][0])
-        -portfolio[ticker][2]
+        portfolio[ticker][4]=Decimal(portfolio[ticker][3]*portfolio[ticker][0])-portfolio[ticker][2]
     #portfolio be the stock ticker key and value as {total shares held[0],average purchase price[1], total cost basis[2], current value of 1 shares[3], unrealized gain/loss[4]}
     #I have the code for current price and unrealized gain/loss = current value - total cost basis
     #current value = current price *total amount of shares
