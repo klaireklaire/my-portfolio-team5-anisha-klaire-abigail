@@ -1,5 +1,3 @@
-Sure, here is a detailed README for setting up environment variables using a `.env` file. You can place this README file in the `data_service` directory to guide your teammates on how to set up the necessary environment variables.
-
 ### `data_service/README.md`
 
 ```markdown
