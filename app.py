@@ -229,8 +229,9 @@ def calculate_position():
     # unrealized gain/loss[4], percent change in stock value}
     #I have the code for current price and unrealized gain/loss = current value - total cost basis
     #current value = current price *total amount of shares
-        
-    return portfolio
+    filtered_portfolio = {ticker: values for ticker, values in portfolio.items() if values[0] > 0}
+    #only return if value>0
+    return filtered_portfolio
 
 @app.route('/portfolio', methods=['GET'])
 def get_portfolio():
