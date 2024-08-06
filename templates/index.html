@@ -16,11 +16,23 @@
                 // Fetch data from the /portfolio endpoint
                 const response = await fetch('http://127.0.0.1:5000/portfolio');
                 const data = await response.json();
-                console.log('Fetched portfolio data:', data); // Debug statement
+                //console.log('Fetched portfolio data:', data); // Debug statement
                 updatePortfolioTable(data); // Update the table with the fetched data
+                updateTotalValue(data); // Update the total portfolio value
+
             } catch (error) {
                 console.error('Error fetching portfolio data:', error);
             }
+        }
+        // Function to update the total portfolio value
+        function updateTotalValue(portfolio) {
+            let totalValue = 0;
+            console.log("before")
+            for (const values of Object.values(portfolio)) {
+                totalValue += values[0] * values[3]; // Total Shares Held * Current Value of 1 Share
+            }
+            console.log("after")
+            document.getElementById('total-value').textContent = `$${totalValue.toFixed(2)}`;
         }
 
         // Function to update the portfolio table with the fetched data
@@ -36,8 +48,8 @@
                 // Create and append cells for each value in the portfolio
                 row.appendChild(createCell(ticker));
                 row.appendChild(createCell(values[0])); // Total Shares Held
-                row.appendChild(createCell(`${values[5].toFixed(2)}%`)); // Percent Change in Stock Value
                 row.appendChild(createCell(`$${values[3].toFixed(2)}`)); // Current Value of 1 Share
+                row.appendChild(createCell(`${values[5].toFixed(2)}%`)); // Percent Change in Stock Value
                 row.appendChild(createCell(`$${(values[0]*values[3]).toFixed(2)}`)); // Unrealized Gain/Loss
                 
 
@@ -53,7 +65,7 @@
         }
 
         // Fetch data initially when the page loads
-        window.onload = fetchPortfolioData;
+        window.onload = fetchPortfolioData();
 
         // Fetch data every 5 seconds
         setInterval(fetchPortfolioData, 5000);
@@ -64,6 +76,7 @@
 <body>
     <div class="container">
         <h1 class="mt-5">User's Stock Portfolio</h1>
+        <h2>Total Value: <span id="total-value">$0.00</span></h2>
         <table class="table table-striped mt-3">
             <thead>
                 <tr>

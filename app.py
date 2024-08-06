@@ -31,7 +31,8 @@ def create_db_connection(db_name=None):
 def home():
     # Convert portfolio DataFrame to HTML table
     portfolio = calculate_position()
-    return render_template('index.html', portfolio=portfolio)
+    total_value = calculate_total_value(portfolio)
+    return render_template('index.html', portfolio=portfolio, total_value=total_value)
 
 @app.route('/chart_data')
 def chart_data():
@@ -232,6 +233,10 @@ def calculate_position():
     filtered_portfolio = {ticker: values for ticker, values in portfolio.items() if values[0] > 0}
     #only return if value>0
     return filtered_portfolio
+
+def calculate_total_value(portfolio):
+    total_value = sum(values[0]*values[3] for values in portfolio.values())
+    return total_value
 
 @app.route('/portfolio', methods=['GET'])
 def get_portfolio():
