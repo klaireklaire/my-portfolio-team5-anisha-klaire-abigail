@@ -133,6 +133,58 @@ def get_transaction(transaction_id):
     else:
         return jsonify({'error': 'Transaction not found'}), 404
 
+@app.route('/buy', methods=['POST'])
+def buy_stock():
+    data = request.json
+    ticker = data.get('ticker')
+    size = data.get('size')
+    
+    if not ticker or not size:
+        return jsonify({'error': 'Ticker and size are required'}), 400
+
+    price = current_price(ticker)
+    db = create_db_connection()
+    cursor = db.cursor()
+    query = """
+        INSERT INTO transactions (date, ticker, side, size, price)
+        VALUES (%s, %s, %s, %s, %s)
+    """
+    cursor.execute(query, (datetime.now().date(), ticker, 'buy', size, price))
+    db.commit()
+    cursor.close()
+    db.close()
+    return jsonify({'message': 'Stock bought successfully'}), 201
+
+@app.route('/sell', methods=['POST'])
+def sell_stock():
+    data = request.json
+    ticker = data.get('ticker')
+    size = data.get('size')
+    
+    if not ticker or not size:
+        return jsonify({'error': 'Ticker and size are required'}), 400
+
+    portfolio = calculate_position()
+    
+    print(type(portfolio[ticker][0]), portfolio[ticker][0])
+    print(type(size), size)
+    
+    if ticker not in portfolio or portfolio[ticker][0] < int(size):
+        return jsonify({'error': 'Not enough shares to sell'}), 400
+
+    price = current_price(ticker)
+    db = create_db_connection()
+    cursor = db.cursor()
+    query = """
+        INSERT INTO transactions (date, ticker, side, size, price)
+        VALUES (%s, %s, %s, %s, %s)
+    """
+    cursor.execute(query, (datetime.now().date(), ticker, 'sell', size, price))
+    db.commit()
+    cursor.close()
+    db.close()
+    return jsonify({'message': 'Stock sold successfully'}), 201
+
 def current_price(ticker):
     stock = yf.Ticker(ticker)
     return stock.info['currentPrice']
@@ -151,7 +203,7 @@ def calculate_position():
     cursor.close()
     connection.close()
     
-    portfolio={} #key is the ticker and value []
+    portfolio={} # key is the ticker and value []
     for t in transactions:
         ticker = t['ticker']
         quantity = t['size']
@@ -159,19 +211,18 @@ def calculate_position():
         price = t['price']
         
         if ticker not in portfolio:
+            portfolio[ticker] = [0, price, 0, 0.0, 0.0] # initial average purchase price is the same as the buy price
             portfolio[ticker] = [0,price,0,0.0, 0.0,0.0] #intial average purchase price is the same as the buy price
         #if it is in portfolio and on the buy side then we need to calculate the average purchase price
         elif ticker in portfolio:
             if side == 'buy':
-                #need to calculate the average purcahse price
-                portfolio[ticker][1] = (portfolio[ticker][1]*portfolio[ticker][0]+quantity*price)/(portfolio[ticker][0]+quantity)
-                
-            #when we sell the average purcahse price remains the same
+                # calculate the average purchase price
+                portfolio[ticker][1] = (portfolio[ticker][1] * portfolio[ticker][0] + quantity * price) / (portfolio[ticker][0] + quantity)
         
-        if side =='buy':
+        if side == 'buy':
             portfolio[ticker][0] += quantity
-            portfolio[ticker][2] +=price*quantity
-        elif side =='sell':
+            portfolio[ticker][2] += price * quantity
+        elif side == 'sell':
             portfolio[ticker][0] -= quantity
             
         portfolio[ticker][3]=current_price(ticker)
@@ -187,18 +238,10 @@ def calculate_position():
         
     return portfolio
 
-
-
-
 @app.route('/portfolio', methods=['GET'])
 def get_portfolio():
-    
     portfolio = calculate_position()
     return jsonify(portfolio)
-
-
-    
-    
 
 if __name__ == '__main__':
     db_service.initialize_database()  # Initialize the database tables
