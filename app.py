@@ -18,6 +18,8 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
+portfolio_history = []
+
 # Database connection details
 def create_db_connection(db_name=None):
     return mysql.connector.connect(
@@ -238,9 +240,18 @@ def calculate_total_value(portfolio):
     total_value = sum(values[0]*values[3] for values in portfolio.values())
     return total_value
 
+@app.route('/portfolio_history', methods=['GET'])
+def get_portfolio_history():
+    return jsonify(portfolio_history)
+
 @app.route('/portfolio', methods=['GET'])
 def get_portfolio():
     portfolio = calculate_position()
+    total_value = calculate_total_value(portfolio)
+    current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    
+    # Append the current total value and timestamp to the history
+    portfolio_history.append({'time': current_time, 'value': total_value})
     return jsonify(portfolio)
 
 if __name__ == '__main__':

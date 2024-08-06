@@ -9,67 +9,7 @@
     <title>Stock Portfolio</title>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-        // Function to fetch portfolio data from the server
-        async function fetchPortfolioData() {
-            try {
-                // Fetch data from the /portfolio endpoint
-                const response = await fetch('http://127.0.0.1:5000/portfolio');
-                const data = await response.json();
-                //console.log('Fetched portfolio data:', data); // Debug statement
-                updatePortfolioTable(data); // Update the table with the fetched data
-                updateTotalValue(data); // Update the total portfolio value
-
-            } catch (error) {
-                console.error('Error fetching portfolio data:', error);
-            }
-        }
-        // Function to update the total portfolio value
-        function updateTotalValue(portfolio) {
-            let totalValue = 0;
-            console.log("before")
-            for (const values of Object.values(portfolio)) {
-                totalValue += values[0] * values[3]; // Total Shares Held * Current Value of 1 Share
-            }
-            console.log("after")
-            document.getElementById('total-value').textContent = `$${totalValue.toFixed(2)}`;
-        }
-
-        // Function to update the portfolio table with the fetched data
-        function updatePortfolioTable(portfolio) {
-            console.log('Updating portfolio table with data:', portfolio); // Debug statement
-            const tableBody = document.getElementById('portfolio-body');
-            console.log('Table body element:', tableBody); // Debug statement to check if element is found
-            tableBody.innerHTML = ''; // Clear existing rows
-
-            for (const [ticker, values] of Object.entries(portfolio)) {
-                const row = document.createElement('tr');
-
-                // Create and append cells for each value in the portfolio
-                row.appendChild(createCell(ticker));
-                row.appendChild(createCell(values[0])); // Total Shares Held
-                row.appendChild(createCell(`$${values[3].toFixed(2)}`)); // Current Value of 1 Share
-                row.appendChild(createCell(`${values[5].toFixed(2)}%`)); // Percent Change in Stock Value
-                row.appendChild(createCell(`$${(values[0]*values[3]).toFixed(2)}`)); // Unrealized Gain/Loss
-                
-
-                tableBody.appendChild(row);
-            }
-        }
-
-        // Helper function to create a table cell
-        function createCell(value) {
-            const cell = document.createElement('td');
-            cell.textContent = value;
-            return cell;
-        }
-
-        // Fetch data initially when the page loads
-        window.onload = fetchPortfolioData();
-
-        // Fetch data every 5 seconds
-        setInterval(fetchPortfolioData, 5000);
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
    
 </head>
 
@@ -77,6 +17,7 @@
     <div class="container">
         <h1 class="mt-5">User's Stock Portfolio</h1>
         <h2>Total Value: <span id="total-value">$0.00</span></h2>
+        <canvas id="portfolioChart" width="400" height="200"></canvas>
         <table class="table table-striped mt-3">
             <thead>
                 <tr>
@@ -84,6 +25,7 @@
                     <th scope="col">Shares</th>
                     <th scope="col">Price per Share</th>
                     <th scope="col">Percent Change</th>
+                    <th scope="col">Unrealized Profit/Loss</th>
                     <th scope="col">Total Value</th>
                 </tr>
             </thead>
@@ -94,11 +36,130 @@
                     <td>{{ values[0] }}</td>
                     <td>${{ '%.2f' | format(values[3]) }}</td>
                     <td>{{ '%.2f' | format(values[5]) }}%</td>
+                    <td>{{ '%.2f' | format(values[4]) }}%</td>
                     <td>${{ '%.2f' | format(values[0] * values[3]) }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+
+        <script>
+             document.addEventListener('DOMContentLoaded', function(){
+                // Function to fetch portfolio data from the server
+                async function fetchPortfolioData() {
+                    try {
+                        // Fetch data from the /portfolio endpoint
+                        const response = await fetch('http://127.0.0.1:5000/portfolio');
+                        const data = await response.json();
+                        //console.log('Fetched portfolio data:', data); // Debug statement
+                        updatePortfolioTable(data); // Update the table with the fetched data
+                        updateTotalValue(data); // Update the total portfolio value
+                        fetchPortfolioHistory();
+                    } catch (error) {
+                            console.error('Error fetching portfolio data:', error);
+                    }
+                }
+
+                // Function to fetch portfolio history data from the server
+                async function fetchPortfolioHistory() {
+                    try {
+                        // Fetch data from the /portfolio_history endpoint
+                        const response = await fetch('http://127.0.0.1:5000/portfolio_history');
+                        const data = await response.json();
+                        console.log('Fetched portfolio history data:', data); // Debug statement
+                        updateValueOverTimeChart(data); // Update the chart with the historical data
+                    } catch (error) {
+                        console.error('Error fetching portfolio history data:', error);
+                    }
+                }
+                // Function to update the total portfolio value
+                function updateTotalValue(portfolio) {
+                    let totalValue = 0;
+                    console.log("before")
+                    for (const values of Object.values(portfolio)) {
+                        totalValue += values[0] * values[3]; // Total Shares Held * Current Value of 1 Share
+                    }
+                    console.log("after")
+                    document.getElementById('total-value').textContent = `$${totalValue.toFixed(2)}`;
+                }
+
+                // Function to update the portfolio table with the fetched data
+                function updatePortfolioTable(portfolio) {
+                    console.log('Updating portfolio table with data:', portfolio); // Debug statement
+                    const tableBody = document.getElementById('portfolio-body');
+                    console.log('Table body element:', tableBody); // Debug statement to check if element is found
+                    tableBody.innerHTML = ''; // Clear existing rows
+
+                    for (const [ticker, values] of Object.entries(portfolio)) {
+                        const row = document.createElement('tr');
+
+                        // Create and append cells for each value in the portfolio
+                        row.appendChild(createCell(ticker));
+                        row.appendChild(createCell(values[0])); // Total Shares Held
+                        row.appendChild(createCell(`$${values[3].toFixed(2)}`)); // Current Value of 1 Share
+                        row.appendChild(createCell(`${values[5].toFixed(2)}%`)); // Percent Change in Stock Value
+                        row.appendChild(createCell(`$${parseFloat(values[4]).toFixed(2)}`)); // Unrealized Gain/Loss
+                        row.appendChild(createCell(`$${(values[0]*values[3]).toFixed(2)}`)); //total value
+                
+
+                        tableBody.appendChild(row);
+                    }
+                }
+
+                function updateValueOverTimeChart(history) {
+                    const labels = history.map(entry => entry.time);
+                    const data = history.map(entry => entry.value);
+
+                    // Update chart data
+                    valueOverTimeChart.data.labels = labels;
+                    valueOverTimeChart.data.datasets[0].data = data;
+                    valueOverTimeChart.update();
+                }
+
+                // Helper function to create a table cell
+                function createCell(value) {
+                    const cell = document.createElement('td');
+                    cell.textContent = value;
+                    return cell;
+                }
+
+                // Initialize Chart.js chart for portfolio value over time
+                const ctxValueOverTime = document.getElementById('portfolioChart').getContext('2d');
+                const valueOverTimeChart = new Chart(ctxValueOverTime, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Portfolio Value Over Time',
+                            data: [],
+                            fill: false,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'minute'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+
+                // Fetch data initially when the page loads
+                fetchPortfolioData();
+
+                // Fetch data every 5 seconds
+                setInterval(fetchPortfolioData, 5000);
+
+            });
+        </script>
     </div>
 
     <div class="container">
