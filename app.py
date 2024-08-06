@@ -211,7 +211,6 @@ def calculate_position():
         price = t['price']
         
         if ticker not in portfolio:
-            portfolio[ticker] = [0, price, 0, 0.0, 0.0] # initial average purchase price is the same as the buy price
             portfolio[ticker] = [0,price,0,0.0, 0.0,0.0] #intial average purchase price is the same as the buy price
         #if it is in portfolio and on the buy side then we need to calculate the average purchase price
         elif ticker in portfolio:
