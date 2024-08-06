@@ -145,6 +145,15 @@
     $(document).ready(function() {
         var chart;
 
+        // Ensure ticker input is always uppercase
+        $('#ticker').on('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+
+        $('#modal-ticker').on('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+
         $('.time-range').click(function() {
             $('.time-range').removeClass('active');
             $(this).addClass('active');
@@ -153,7 +162,7 @@
 
         $('#stock-form').submit(function(event) {
             event.preventDefault();
-            var ticker = $('#ticker').val();
+            var ticker = $('#ticker').val().toUpperCase();
             var range = $('#selected-range').val();
             if (!range) {
                 alert("Please select a time range.");
@@ -224,7 +233,7 @@
         });
 
         $('#transactionModal').on('show.bs.modal', function (event) {
-            var ticker = $('#ticker').val();
+            var ticker = $('#ticker').val().toUpperCase();
             if (!ticker) {
                 alert("Please enter a ticker first.");
                 return false;  // Prevent the modal from showing
@@ -259,6 +268,11 @@
             var ticker = $('#modal-ticker').val();
             var side = $('#modal-side').val();
             var size = $('#modal-size').val();
+
+            if (size <= 0 || isNaN(size)) {
+                alert('Size must be a positive number');
+                return;
+            }
 
             // Check if transaction is valid
             $.getJSON('/portfolio', function(portfolio) {
