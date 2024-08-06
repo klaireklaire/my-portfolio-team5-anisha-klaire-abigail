@@ -9,6 +9,55 @@
     <title>Stock Portfolio</title>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+        // Function to fetch portfolio data from the server
+        async function fetchPortfolioData() {
+            try {
+                // Fetch data from the /portfolio endpoint
+                const response = await fetch('http://127.0.0.1:5000/portfolio');
+                const data = await response.json();
+                console.log('Fetched portfolio data:', data); // Debug statement
+                updatePortfolioTable(data); // Update the table with the fetched data
+            } catch (error) {
+                console.error('Error fetching portfolio data:', error);
+            }
+        }
+
+        // Function to update the portfolio table with the fetched data
+        function updatePortfolioTable(portfolio) {
+            console.log('Updating portfolio table with data:', portfolio); // Debug statement
+            const tableBody = document.getElementById('portfolio-body');
+            console.log('Table body element:', tableBody); // Debug statement to check if element is found
+            tableBody.innerHTML = ''; // Clear existing rows
+
+            for (const [ticker, values] of Object.entries(portfolio)) {
+                const row = document.createElement('tr');
+
+                // Create and append cells for each value in the portfolio
+                row.appendChild(createCell(ticker));
+                row.appendChild(createCell(values[0])); // Total Shares Held
+                row.appendChild(createCell(`${values[5].toFixed(2)}%`)); // Percent Change in Stock Value
+                row.appendChild(createCell(`$${values[3].toFixed(2)}`)); // Current Value of 1 Share
+                row.appendChild(createCell(`$${(values[0]*values[3]).toFixed(2)}`)); // Unrealized Gain/Loss
+                
+
+                tableBody.appendChild(row);
+            }
+        }
+
+        // Helper function to create a table cell
+        function createCell(value) {
+            const cell = document.createElement('td');
+            cell.textContent = value;
+            return cell;
+        }
+
+        // Fetch data initially when the page loads
+        window.onload = fetchPortfolioData;
+
+        // Fetch data every 5 seconds
+        setInterval(fetchPortfolioData, 5000);
+    </script>
    
 </head>
 
