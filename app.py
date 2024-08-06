@@ -7,7 +7,6 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
 import data_service.initialize_db as db_service
-from data_service.getData import portfolio_df
 from flask_cors import CORS
 import mysql.connector
 import os
@@ -32,7 +31,6 @@ def create_db_connection(db_name=None):
 def home():
     # Convert portfolio DataFrame to HTML table
     portfolio = calculate_position()
-    table_html = portfolio_df.to_html(classes='table table-striped', index=False)
     return render_template('index.html', portfolio=portfolio)
 
 @app.route('/chart_data')
@@ -231,9 +229,6 @@ def calculate_position():
     # unrealized gain/loss[4], percent change in stock value}
     #I have the code for current price and unrealized gain/loss = current value - total cost basis
     #current value = current price *total amount of shares
-
-    
-    
         
     return portfolio
 
