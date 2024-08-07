@@ -1,3 +1,5 @@
+<img width="1674" alt="image" src="https://github.com/user-attachments/assets/5407ab82-e9dd-4d30-8194-d4ce207c5e17">
+
 ### README.md
 
 # InvestWise – Stock Portfolio Simulator
