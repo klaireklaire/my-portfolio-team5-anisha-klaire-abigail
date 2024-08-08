@@ -14,82 +14,14 @@
 </head>
 
 <body>
+
     <div class="container">
         <h1 class="text-primary mt-5">InvestWise – Stock Simulator</h1>
         <p class="lead">
             Learn how to invest with InvestWise, a Stock Simulator! This tool is designed to help you learn how to invest in the stock market.
             You can view the performance of various stocks, buy and sell shares, and track your portfolio's performance over time.
         </p>
-        <p>
-            <strong class="text-third">How to use this site:</strong>
-            <ul>
-                <li>Enter a stock ticker symbol (e.g., AAPL for Apple, GOOGL for Google) in the input box and click "View Chart" to see the stock's performance.</li>
-                <li>Select a time range (1 Year, 6 Months, 3 Months, 1 Month) to adjust the chart.</li>
-                <li>Click the "Buy/Sell" button to open the transaction modal, where you can buy or sell shares of the selected stock.</li>
-                <li>The additional information section provides details such as the stock's opening price, high, low, volume, market cap, and more.</li>
-                <li>Use this simulator to practice your investing skills and track how your decisions impact your portfolio.</li>
-            </ul>
-        </p>
     </div>
-
-    <div class="container">
-        <p>
-            <strong class="text-third">Interested in learning more?</strong>
-        </p>
-        <div class="container">
-            <button class="btn btn-action" type="button" data-toggle="collapse" data-target="#tips-container" aria-expanded="false" aria-controls="tips-container">
-                Show Investment Tips
-            </button>
-            <div class="collapse mt-3" id="tips-container">
-                <div class="card card-body">
-                    <p><strong class="text-fourth">When Stock Prices Go Up:</strong></p>
-                    <ul>
-                        <li>Consider selling some shares to lock in profits. This strategy, known as rebalancing, helps maintain your portfolio's risk level and ensures gains are realized. <a class="link" href="https://www.investopedia.com/terms/r/rebalancing.asp" target="_blank">[Investopedia]</a></li>
-                        <li>Reevaluate the stock's future growth potential. If the fundamentals still look strong, holding onto the stock might be the best option. <a class="link" href="https://www.fidelity.com/learning-center/trading-investing/when-to-sell-stocks-investments" target="_blank">[Fidelity]</a></li>
-                    </ul>
-                    <p><strong class="text-fourth" >When Stock Prices Go Down:</strong></p>
-                    <ul>
-                        <li>Avoid panic selling. Stocks can be volatile, and quick decisions based on fear can lead to losses. Consider the reasons for the decline and whether the fundamentals have changed. <a class="link" href="https://www.forbes.com/advisor/investing/what-are-stocks" target="_blank">[Forbes]</a></li>
-                        <li>Look for buying opportunities. If the stock's fundamentals are still solid, a lower price could be a good opportunity to buy more shares at a discount. <a class="link" href="https://www.nerdwallet.com/article/investing/what-to-do-when-stock-market-is-crashing" target="_blank">[NerdWallet]</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>    
-
-        <div class="container mt-3">
-            <button class="btn btn-action" type="button" data-toggle="collapse" data-target="#strategies-container" aria-expanded="false" aria-controls="strategies-container">
-                Show Investment Strategies
-            </button>
-            <div class="collapse mt-3" id="strategies-container">
-                <div class="card card-body">
-                    <p><strong class="text-fourth">Long-term Investing:</strong></p>
-                    <ul>
-                        <li>Focus on companies with strong fundamentals and a proven track record. This approach minimizes the impact of market volatility and allows investments to grow over time. <a class="link" href="https://www.investopedia.com/terms/l/longterm.asp" target="_blank">[Investopedia]</a></li>
-                        <li>Diversify your portfolio to spread risk across different sectors and asset classes. This reduces the impact of a downturn in any one investment. <a class="link" href=https://www.fidelity.com/viewpoints/investing-ideas/guide-to-diversification target="_blank">[Fidelity]</a></li>
-                    </ul>
-                    <p><strong class="text-fourth">Short-term Trading:</strong></p>
-                    <ul>
-                        <li>Use technical analysis to identify trends and trading opportunities. This approach involves analyzing charts and historical data to make informed trading decisions. <a class="link" href="https://www.investopedia.com/terms/t/technical-analysis-of-stocks-and-trends.asp" target="_blank">[Investopedia]</a></li>
-                        <li>Set stop-loss orders to limit potential losses. This helps manage risk and protect your capital from significant downturns. <a class="link"href="https://www.nerdwallet.com/article/investing/selling-a-stock" target="_blank">[NerdWallet]</a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-
-        <div class="container mt-3">
-            <button class="btn btn-action" type="button" data-toggle="collapse" data-target="#resources-container" aria-expanded="false" aria-controls="strategies-container">
-                Recommended Resources
-            </button>
-            <div class="collapse mt-3" id="resources-container">
-                <div class="card card-body">
-                    <li><a href="https://www.morganstanley.com/newsletter/subscribe" class="link" target="_blank">[Morgan Stanley Five Ideas Financial News]</a></li>
-                    <li><a href="https://www.morganstanley.com/articles/investment-solutions-decision-guide" class="link" target="_blank">[Morgan Stanley New Investors Guide]</a></li>
-                    <li><a href="https://www.bloomberg.com/podcasts/series/daybreak-americas" class="link" target="_blank">[Bloomberg Daybreak Podcast]</a></li>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
     <div class="container">
         <h1 class="text-secondary mt-5">User's Stock Portfolio</h1>
@@ -242,7 +174,7 @@
         </script>
     </div>
 
-    <div class="container mb-3">
+    <div class="container">
         <h1 class="text-secondary mt-5">Stock Performance Chart</h1>
         <form id="stock-form" class="form-inline justify-content-center mt-3">
             <div class="form-group mb-2">
@@ -302,7 +234,78 @@
         </div>        
     </div>
 
-    <footer class="footer mb-3 py-3">
+    <div class="container mt-3">
+        <p>
+            <strong class="text-third">How to use this site:</strong>
+            <ul>
+                <li>Enter a stock ticker symbol (e.g., AAPL for Apple, GOOGL for Google) in the input box and click "View Chart" to see the stock's performance.</li>
+                <li>Select a time range (1 Year, 6 Months, 3 Months, 1 Month) to adjust the chart.</li>
+                <li>Click the "Buy/Sell" button to open the transaction modal, where you can buy or sell shares of the selected stock.</li>
+                <li>The additional information section provides details such as the stock's opening price, high, low, volume, market cap, and more.</li>
+                <li>Use this simulator to practice your investing skills and track how your decisions impact your portfolio.</li>
+            </ul>
+        </p>
+    </div>
+
+    <div class="container">
+        <p>
+            <strong class="text-third">Interested in learning more?</strong>
+        </p>
+        <div class="container">
+            <button class="btn btn-action" type="button" data-toggle="collapse" data-target="#tips-container" aria-expanded="false" aria-controls="tips-container">
+                Show Investment Tips
+            </button>
+            <div class="collapse mt-3" id="tips-container">
+                <div class="card card-body">
+                    <p><strong class="text-fourth">When Stock Prices Go Up:</strong></p>
+                    <ul>
+                        <li>Consider selling some shares to lock in profits. This strategy, known as rebalancing, helps maintain your portfolio's risk level and ensures gains are realized. <a class="link" href="https://www.investopedia.com/terms/r/rebalancing.asp" target="_blank">[Investopedia]</a></li>
+                        <li>Reevaluate the stock's future growth potential. If the fundamentals still look strong, holding onto the stock might be the best option. <a class="link" href="https://www.fidelity.com/learning-center/trading-investing/when-to-sell-stocks-investments" target="_blank">[Fidelity]</a></li>
+                    </ul>
+                    <p><strong class="text-fourth" >When Stock Prices Go Down:</strong></p>
+                    <ul>
+                        <li>Avoid panic selling. Stocks can be volatile, and quick decisions based on fear can lead to losses. Consider the reasons for the decline and whether the fundamentals have changed. <a class="link" href="https://www.forbes.com/advisor/investing/what-are-stocks" target="_blank">[Forbes]</a></li>
+                        <li>Look for buying opportunities. If the stock's fundamentals are still solid, a lower price could be a good opportunity to buy more shares at a discount. <a class="link" href="https://www.nerdwallet.com/article/investing/what-to-do-when-stock-market-is-crashing" target="_blank">[NerdWallet]</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>    
+
+        <div class="container mt-3">
+            <button class="btn btn-action" type="button" data-toggle="collapse" data-target="#strategies-container" aria-expanded="false" aria-controls="strategies-container">
+                Show Investment Strategies
+            </button>
+            <div class="collapse mt-3" id="strategies-container">
+                <div class="card card-body">
+                    <p><strong class="text-fourth">Long-term Investing:</strong></p>
+                    <ul>
+                        <li>Focus on companies with strong fundamentals and a proven track record. This approach minimizes the impact of market volatility and allows investments to grow over time. <a class="link" href="https://www.investopedia.com/terms/l/longterm.asp" target="_blank">[Investopedia]</a></li>
+                        <li>Diversify your portfolio to spread risk across different sectors and asset classes. This reduces the impact of a downturn in any one investment. <a class="link" href=https://www.fidelity.com/viewpoints/investing-ideas/guide-to-diversification target="_blank">[Fidelity]</a></li>
+                    </ul>
+                    <p><strong class="text-fourth">Short-term Trading:</strong></p>
+                    <ul>
+                        <li>Use technical analysis to identify trends and trading opportunities. This approach involves analyzing charts and historical data to make informed trading decisions. <a class="link" href="https://www.investopedia.com/terms/t/technical-analysis-of-stocks-and-trends.asp" target="_blank">[Investopedia]</a></li>
+                        <li>Set stop-loss orders to limit potential losses. This helps manage risk and protect your capital from significant downturns. <a class="link"href="https://www.nerdwallet.com/article/investing/selling-a-stock" target="_blank">[NerdWallet]</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mt-3">
+            <button class="btn btn-action" type="button" data-toggle="collapse" data-target="#resources-container" aria-expanded="false" aria-controls="strategies-container">
+                Recommended Resources
+            </button>
+            <div class="collapse mt-3" id="resources-container">
+                <div class="card card-body">
+                    <li><a href="https://www.morganstanley.com/newsletter/subscribe" class="link" target="_blank">[Morgan Stanley Five Ideas Financial News]</a></li>
+                    <li><a href="https://www.morganstanley.com/articles/investment-solutions-decision-guide" class="link" target="_blank">[Morgan Stanley New Investors Guide]</a></li>
+                    <li><a href="https://www.bloomberg.com/podcasts/series/daybreak-americas" class="link" target="_blank">[Bloomberg Daybreak Podcast]</a></li>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-3 mb-3 py-3">
         <div class="container">
             <span class="text-muted">Disclaimer: This platform is a training project created by our team for educational purposes. We are not financial advisors, and this is not a real trading platform. The information provided here should not be considered financial advice. Always do your own research before making any investment decisions.</span>
         </div>
