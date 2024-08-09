@@ -49,11 +49,11 @@ def initialize_database():
     """)
     # Insert sample data
     sample_data = [
-        ('2023-01-01', 'AAPL', 'buy', 10, 150.00),
-        ('2023-02-01', 'GOOG', 'buy', 5, 150.00),
-        ('2023-03-01', 'MSFT', 'buy', 6, 350.00),
-        ('2023-04-01', 'TSLA', 'buy', 15, 150.00),
-        ('2023-05-01', 'AMZN', 'buy', 10, 150.00)
+        ('2024-07-16', 'AAPL', 'buy', 10, 234.82),
+        ('2024-03-06', 'GOOG', 'buy', 5, 132.56),
+        ('2024-04-30', 'MSFT', 'buy', 6, 389.33),
+        ('2024-03-12', 'TSLA', 'buy', 15, 177.54),
+        ('2024-01-05', 'AMZN', 'buy', 10, 145.24)
     ]
     cursor.executemany("""
         INSERT INTO transactions (date, ticker, side, size, price)
